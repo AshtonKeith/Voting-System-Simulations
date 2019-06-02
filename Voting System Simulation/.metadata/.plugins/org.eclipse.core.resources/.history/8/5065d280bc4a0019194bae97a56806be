@@ -1,0 +1,59 @@
+package main;
+
+import java.util.Random;
+
+public class Main {
+	
+	public static final int SEED = 1;
+	
+	public static Random r;
+	
+	private Main() {
+		r = new Random(SEED);
+	}
+	
+	public static void main(String[] args) { 
+		
+	}
+	
+	public class Voter{
+
+		public static final int NUM = 1000;
+		private double[] views;
+		
+		private Voter() {
+			this.views[0] = r.nextGaussian()/5;
+			this.views[1] = r.nextGaussian()/5;
+		}
+		
+		public double[] getViews() {
+			return views;
+		}
+		
+		public double getViews(int index) {
+			return views[index];
+		}
+		
+	}
+	
+	public class Candidate{
+		
+		public static final int NUM = 2;
+		private double[] views;
+		
+		private Candidate() {
+			this.views[0] = r.nextGaussian()/5;
+			this.views[1] = r.nextGaussian()/5;
+		}
+		
+		public double[] getViews() {
+			return views;
+		}
+		
+		public double getViews(int index) {
+			return views[index];
+		}
+		
+	}
+
+}

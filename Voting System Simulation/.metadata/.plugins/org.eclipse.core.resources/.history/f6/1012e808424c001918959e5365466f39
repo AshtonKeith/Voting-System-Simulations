@@ -1,0 +1,17 @@
+package main;
+
+import java.util.Random;
+
+public class Main {
+
+	public static final int VOTER_NUM = 10000;
+	public static final int CAND_NUM = 2;
+	
+	private Main() {
+		Election e = new Election(1);
+	}
+	public static void main(String[] args) { 
+		new Main();
+	}
+	
+}

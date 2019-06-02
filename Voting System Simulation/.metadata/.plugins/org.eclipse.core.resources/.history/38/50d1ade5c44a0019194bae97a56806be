@@ -1,0 +1,22 @@
+package main;
+
+import java.util.Random;
+
+public class Main {
+	
+	public static final int SEED = 1;
+
+	public static final int VOTER_NUM = 1000;
+	public static final int CAND_NUM = 2;
+	
+	public static Random r;
+	
+	private Main() {
+		r = new Random(SEED);
+		new Election();
+	}
+	public static void main(String[] args) { 
+		new Main();
+	}
+	
+}

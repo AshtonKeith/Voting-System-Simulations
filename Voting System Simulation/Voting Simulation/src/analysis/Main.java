@@ -1,67 +1,31 @@
 package analysis;
 
-import java.awt.Color;
-import java.awt.Component;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.image.BufferedImage;
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 
-import javax.imageio.ImageIO;
-
 public class Main {
 	
-	double uav = 0;
-	double hpav = 0;
-	double rpav = 0;
-	double hrav = 0;
-	double srav = 0;
-	double rrav = 0;
-	double hbav = 0;
-	double rbav = 0;
-	double hcav = 0;
-	double scav = 0;
-	double hhav = 0;
-	double hlav = 0;
-	
-	int[] uhist = new int[2000];
-	int[] hphist = new int[2000];
-	int[] rphist = new int[2000];
-	int[] hrhist = new int[2000];
-	int[] rrhist = new int[2000];
-	int[] hbhist = new int[2000];
-	int[] rbhist = new int[2000];
-	int[] hchist = new int[2000];
-	int[] schist = new int[2000];
+	double 	uav = 0, hpav = 0, rpav = 0,
+			hrav = 0, srav = 0, rrav = 0,
+			hbav = 0, rbav = 0, hcav = 0,
+			scav = 0, hhav = 0, hlav = 0;
 	
 	private Main() throws IOException {
+		//Replace "Results_8.txt" with the name on the file you want to analyze
 		mean("Results_8.txt");
 		error("Results_8.txt");
 	}
 	
-	@SuppressWarnings("unused")
 	private void mean(String path) throws IOException {
 		BufferedReader br = new BufferedReader(new FileReader(new File(path)));
-		double start = System.nanoTime();
-		int i = 0;
 		int n = 0;
 
-		double usum = 0;
-		double hpsum = 0;
-		double rpsum = 0;
-		double hrsum = 0;
-		double srsum = 0;
-		double rrsum = 0;
-		double hbsum = 0;
-		double rbsum = 0;
-		double hcsum = 0;
-		double scsum = 0;
-		double hhsum = 0;
-		double hlsum = 0;
+		double 	usum = 0, hpsum = 0, rpsum = 0,
+				hrsum = 0, srsum = 0, rrsum = 0,
+				hbsum = 0, rbsum = 0, hcsum = 0,
+				scsum = 0, hhsum = 0, hlsum = 0;
 		
 		String line = "";
 		while((line = br.readLine()) != null) {
@@ -97,35 +61,22 @@ public class Main {
 				hhsum+=Double.parseDouble(result);
 			if(electionType.compareTo("\\hl\\") == 0)
 				hlsum+=Double.parseDouble(result);
-			
-			i++;
-			//if(i%10000 == 0)
-				//System.out.println(i + " -- " + (System.nanoTime()-start)/1000.0/i);
 		}
+		br.close();
 		
 		double t = 0;
 		
 		switch(n) {
-		case 3: t=1000000d;
-			break;
-		case 4: t=1000000d;
-			break;
-		case 5: t=500000d;
-			break;
-		case 7: t=350000d;
-			break;
-		case 8: t=300000d;
-			break;
-		case 10: t=250000d;
-			break;
-		case 12: t=200000d;
-			break;
-		case 15: t=200000d;
-			break;
-		case 20: t=120000d;
-			break;
-		case 25: t=100000d;
-			break;
+			case 3: t=1000000d; break;
+			case 4: t=1000000d; break;
+			case 5: t=500000d; break;
+			case 7: t=350000d; break;
+			case 8: t=300000d; break;
+			case 10: t=250000d; break;
+			case 12: t=200000d; break;
+			case 15: t=200000d; break;
+			case 20: t=120000d; break;
+			case 25: t=100000d; break;
 		}
 
 		System.out.println("\\u\\ " + n + "\\x\\" + (uav=usum/t));
@@ -143,25 +94,14 @@ public class Main {
 		
 	}
 	
-	@SuppressWarnings("unused")
 	private void error(String path) throws IOException {
 		BufferedReader br = new BufferedReader(new FileReader(new File(path)));
-		double start = System.nanoTime();
-		int i = 0;
 		int n = 0;
-		
-		double usum = 0;
-		double hpsum = 0;
-		double rpsum = 0;
-		double hrsum = 0;
-		double srsum = 0;
-		double rrsum = 0;
-		double hbsum = 0;
-		double rbsum = 0;
-		double hcsum = 0;
-		double scsum = 0;
-		double hhsum = 0;
-		double hlsum = 0;
+
+		double 	usum = 0, hpsum = 0, rpsum = 0,
+				hrsum = 0, srsum = 0, rrsum = 0,
+				hbsum = 0, rbsum = 0, hcsum = 0,
+				scsum = 0, hhsum = 0, hlsum = 0;
 		
 		String line = "";
 		while((line = br.readLine()) != null) {
@@ -197,35 +137,22 @@ public class Main {
 				hhsum+=(Double.parseDouble(result)-hhav)*(Double.parseDouble(result)-hhav);
 			if(electionType.compareTo("\\hl\\") == 0)
 				hlsum+=(Double.parseDouble(result)-hlav)*(Double.parseDouble(result)-hlav);
-			
-			i++;
-			//if(i%10000 == 0)
-				//System.out.println(i + " -- " + (System.nanoTime()-start)/1000.0/i);
 		}
+		br.close();
 		
 		double t = 0;
 		
 		switch(n) {
-		case 3: t=1000000;
-			break;
-		case 4: t=1000000;
-			break;
-		case 5: t=500000;
-			break;
-		case 7: t=350000;
-			break;
-		case 8: t=300000;
-			break;
-		case 10: t=250000;
-			break;
-		case 12: t=200000;
-			break;
-		case 15: t=200000;
-			break;
-		case 20: t=120000;
-			break;
-		case 25: t=100000;
-			break;
+			case 3: t=1000000;	break;
+			case 4: t=1000000;	break;
+			case 5: t=500000;	break;
+			case 7: t=350000;	break;
+			case 8: t=300000;	break;
+			case 10: t=250000;	break;
+			case 12: t=200000;	break;
+			case 15: t=200000;	break;
+			case 20: t=120000;	break;
+			case 25: t=100000;	break;
 		}
 
 		System.out.println("\\u\\ " + n + "\\e\\" + 2.5758d*Math.sqrt(usum)/t);
@@ -241,62 +168,7 @@ public class Main {
 		System.out.println("\\hh\\ " + n + "\\e\\" + 2.5758d*Math.sqrt(hhsum)/t);
 		System.out.println("\\hl\\ " + n + "\\e\\" + 2.5758d*Math.sqrt(hlsum)/t);
 		
-	}		
-	
-	private void graphs(String path) throws IOException {
-		
-		BufferedReader br = new BufferedReader(new FileReader(new File(path)));
-		double start = System.nanoTime();
-		int i = 0;
-		int n = 0;
-		
-		String line = "";
-		while((line = br.readLine()) != null) {
-			String electionType = line.split(" ")[4];
-			n = Integer.parseInt(line.split(" ")[3]);
-
-			String result;
-			if(electionType.compareTo("\\x\\") != 0 && electionType.compareTo("\\y\\") != 0)
-				result = line.split(" ")[8+n];
-			else continue;
-
-			double ptemp = 0;
-			double rtemp = 0;
-			double btemp = 0;
-			double ctemp = 0;
-			if(electionType.compareTo("\\hp\\") == 0)
-				ptemp = Double.parseDouble(result);
-			if(electionType.compareTo("\\rp\\") == 0)
-				rphist[(int) Math.floor(Double.parseDouble(result)*1000-ptemp*1000)+500]++;
-			if(electionType.compareTo("\\hr\\") == 0)
-				rtemp = Double.parseDouble(result);
-			if(electionType.compareTo("\\rr\\") == 0)
-				rrhist[(int) Math.floor(Double.parseDouble(result)*1000-rtemp*1000)+500]++;
-			if(electionType.compareTo("\\hb\\") == 0)
-				btemp = Double.parseDouble(result);
-			if(electionType.compareTo("\\rb\\") == 0)
-				rbhist[(int) Math.floor(Double.parseDouble(result)*1000-btemp*1000)+500]++;
-			if(electionType.compareTo("\\hc\\") == 0)
-				ctemp = Double.parseDouble(result);
-			if(electionType.compareTo("\\sc\\") == 0)
-				schist[(int) Math.floor(Double.parseDouble(result)*1000-ctemp*1000)+500]++;
-			
-			i++;
-		}
-		BufferedImage bi = new BufferedImage(2000, 1000, BufferedImage.TYPE_INT_RGB);
-		Graphics g = bi.getGraphics();
-		
-		new Drawer(rphist).paint(g);
-		ImageIO.write(bi, "png", new File(path.split(".txt")[0] + "/dpGraph.png"));
-		new Drawer(rrhist).paint(g);
-		ImageIO.write(bi, "png", new File(path.split(".txt")[0] + "/drGraph.png"));
-		new Drawer(rbhist).paint(g);
-		ImageIO.write(bi, "png", new File(path.split(".txt")[0] + "/dbGraph.png"));
-		new Drawer(schist).paint(g);
-		ImageIO.write(bi, "png", new File(path.split(".txt")[0] + "/dcGraph.png"));
-		
-		System.out.println(path + " finished.");
-	}
+	}	
 	
 	public static void main(String[] args) {
 		try {
@@ -304,26 +176,5 @@ public class Main {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-	}
-
-	private class Drawer extends Component{
-		
-		int[] dataset;
-		
-		private Drawer(int[] dataset) {
-			this.dataset=dataset;
-		}
-		
-		@Override
-		public void paint(Graphics g) {
-			g.setColor(Color.WHITE);
-			g.fillRect(0,0,2000,1000);
-			
-			g.setColor(Color.BLACK);
-			for(int i = 0; i < 2000; i++) {
-				g.drawLine(i, 999, i, dataset[i]==0? 999 : 999-(int)(Math.log10(dataset[i])*1000.0/6.0));
-			}
-		}
-		
 	}
 }

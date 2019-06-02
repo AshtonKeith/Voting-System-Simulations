@@ -1,0 +1,75 @@
+package main;
+
+import main.Main.Candidate;
+import main.Main.Voter;
+
+public abstract class Method {
+	
+	public static Plurality PLURALITY = new Plurality();
+	public static Range RANGE = new Range();
+	
+	public double[] results = new double[Main.Candidate.NUM];
+	public void runElection() {
+		for(int i = 0; i < Main.Voter.NUM; i++) {
+			double[] b = vote(Main.voters[i]);
+			for(int j = 0; j < b.length; j++)
+				results[j]+=b[j];
+		}
+	}
+	public abstract double[] vote(Main.Voter v);
+	public void printResults() {
+		for(int i = 0; i < results.length; i++)
+			System.out.println(i + " - " + results[i]);
+	}
+	
+	public static class Plurality extends Method{
+		
+		@Override
+		public double[] vote(Voter v) {
+			int favorite = 0;
+			double favoritism = -10;
+			for(int i = 0; i<Main.Candidate.NUM; i++) {
+				double t = v.utility(Main.candidates[i]);
+				if(t>favoritism) {
+					favorite = i;
+					favoritism = t;
+				}
+			}
+			
+			double[] ballot = new double[results.length];
+			for(int i = 0; i < ballot.length; i++)
+				ballot[i] = i==favorite ? 1 : 0;
+			
+			return ballot;
+		}
+		
+	}
+	public static class Range extends Method{
+
+		@Override
+		public double[] vote(Voter v) {
+			double[] ballot = new double[results.length];
+			for(int i = 0; i < ballot.length; i++)
+				ballot[i] = v.utility(Main.candidates[i]);
+			return ballot;
+		}
+		
+	}
+	public static class Borda extends Method{
+
+		@Override
+		public double[] vote(Voter v) {
+			double[] ballot1 = new double[results.length];
+			for(int i = 0; i < ballot1.length; i++)
+				ballot1[i] = v.utility(Main.candidates[i]);
+			
+			double[] ballot = new double[results.length];
+			for(int i = 0; i < ballot.length; i++)
+				for(int j = i+1; j < ballot.length; j++)
+					ballot[ballot1[i]>ballot1[j] ? i : j]++;
+			
+			return ballot;
+		}
+		
+	}
+}

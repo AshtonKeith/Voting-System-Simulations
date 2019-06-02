@@ -1,0 +1,78 @@
+package main;
+
+import java.util.Random;
+
+public class Main {
+	
+	public static final int SEED = 1;
+	
+	public static Random r;
+	
+	public static Voter[] voters = new Voter[Voter.NUM];
+	public static Candidate[] candidates = new Candidate[Candidate.NUM];
+	
+	private Main() {
+		r = new Random(SEED);
+		setupElection();
+		Method.PLURALITY.runElection();
+		Method.PLURALITY.printResults();
+	}
+	
+	private void setupElection() {
+		for(int i = 0; i < Voter.NUM; i++)
+			voters[i] = new Voter();
+		for(int i = 0; i < Candidate.NUM; i++)
+			candidates[i] = new Candidate();
+	}
+	
+	public static void main(String[] args) { 
+		new Main();
+	}
+	
+	public class Voter{
+
+		public static final int NUM = 1000;
+		private double[] views;
+		
+		private Voter() {
+			this.views = new double[] {r.nextGaussian()/5, r.nextGaussian()/5};
+		}
+		
+		public double[] getViews() {
+			return views;
+		}
+		
+		public double getViews(int index) {
+			return views[index];
+		}
+		
+		public double utility(Candidate c) {
+			double disappointment = 0;
+			for(int i = 0; i < views.length; i++) {
+				disappointment += (views[i]-c.getViews(i))*(views[i]-c.getViews(i));
+			}
+			return -disappointment;
+		}
+		
+	}
+	
+	public class Candidate{
+		
+		public static final int NUM = 2;
+		private double[] views;
+		
+		private Candidate() {
+			this.views = new double[] {r.nextGaussian()/5, r.nextGaussian()/5};
+		}
+		
+		public double[] getViews() {
+			return views;
+		}
+		
+		public double getViews(int index) {
+			return views[index];
+		}
+		
+	}
+
+}

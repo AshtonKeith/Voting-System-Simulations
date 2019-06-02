@@ -1,0 +1,132 @@
+package main;
+
+import java.util.Random;
+
+import main.Method.*;
+
+public class Election {
+	
+	public int SEED;
+	public Random r;
+	
+	public Voter[] voters;
+	public Candidate[] candidates;
+	
+	public HonestPlurality honest_plurality;
+	public RationalPlurality rational_plurality;
+	private HonestRange range;
+	private Borda borda;
+	private Copeland copeland;
+	private Hale hale;
+	private Lottery lottery;
+	
+	public Election(int SEED) {
+		this.SEED = SEED;
+		setupElection();
+	};
+	
+	private void setupElection() {
+		r = new Random(SEED);
+		
+		voters = new Voter[Main.VOTER_NUM];
+		candidates = new Candidate[Main.CAND_NUM];
+		for(int i = 0; i < Main.VOTER_NUM; i++)
+			voters[i] = new Voter();
+		for(int i = 0; i < Main.CAND_NUM; i++)
+			candidates[i] = new Candidate();
+		
+		honest_plurality = new HonestPlurality(this);
+		rational_plurality = new RationalPlurality(this);
+		range = new HonestRange(this);
+		borda = new Borda(this);
+		copeland = new Copeland(this);
+		hale = new Hale(this);
+		lottery = new Lottery(this);
+	}
+	
+	public void runElection() {
+		honest_plurality.runElection();
+		rational_plurality.runElection();
+		range.runElection();
+		borda.runElection();
+		copeland.runElection();
+		hale.runElection();
+		lottery.runElection();
+	}
+	
+	public String printViews(int view) {
+		String out = "\\e\\ " + SEED + " \\n\\ " + Main.CAND_NUM + (view==0 ? " \\x\\ " : " \\y\\ ");
+		for(int i = 0; i < Main.CAND_NUM; i++) {
+			Candidate c = candidates[i];
+			out += c.getViews(view) + " ";
+		}
+		out += "\\a\\ " + average()[view];
+		return out;
+	}
+	
+	public void printResults() {
+		System.out.println(printViews(0));
+		System.out.println(printViews(1));
+		System.out.println(honest_plurality.printResults());
+		System.out.println(rational_plurality.printResults());
+		System.out.println(range.printResults());
+		System.out.println(borda.printResults());
+		System.out.println(copeland.printResults());
+		System.out.println(hale.printResults());
+		System.out.println(lottery.printResults());
+	}
+	
+	public double[] average(){
+		double[] av = new double[] {0.0,0.0};
+		for(Voter v : voters) {
+			av[0]+=v.getViews(0);
+			av[1]+=v.getViews(1);
+		}
+		av[0]/=Main.VOTER_NUM;
+		av[1]/=Main.VOTER_NUM;
+		return av;
+	}
+	
+	public class Voter{
+		private double[] views;
+		
+		private Voter() {
+			this.views = new double[] {r.nextGaussian()/5, r.nextGaussian()/5};
+		}
+		
+		public double[] getViews() {
+			return views;
+		}
+		
+		public double getViews(int index) {
+			return views[index];
+		}
+		
+		public double utility(Candidate c) {
+			double disappointment = 0;
+			for(int i = 0; i < views.length; i++) {
+				disappointment += (views[i]-c.getViews(i))*(views[i]-c.getViews(i));
+			}
+			return -disappointment;
+		}
+		
+	}
+	
+	public class Candidate{
+		private double[] views;
+		
+		private Candidate() {
+			this.views = new double[] {r.nextGaussian()/5, r.nextGaussian()/5};
+		}
+		
+		public double[] getViews() {
+			return views;
+		}
+		
+		public double getViews(int index) {
+			return views[index];
+		}
+		
+	}
+
+}

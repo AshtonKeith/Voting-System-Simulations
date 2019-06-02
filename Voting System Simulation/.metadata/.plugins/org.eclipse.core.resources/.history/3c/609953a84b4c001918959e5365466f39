@@ -1,0 +1,21 @@
+package main;
+
+public class Main {
+
+	public static final int VOTER_NUM = 1000;
+	public static final int CAND_NUM = 20;
+	
+	private Main() {
+		double start = System.nanoTime();
+		Election e = new Election(1);
+		e.runElection();
+		System.out.println(Math.floor((System.nanoTime()-start)/10000/60) + " minutes " + ((System.nanoTime()-start)/10000)%60 + " seconds");
+		e.printResults();
+		System.out.println();
+	}
+	
+	public static void main(String[] args) { 
+		new Main();
+	}
+	
+}

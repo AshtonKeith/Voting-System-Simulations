@@ -1,0 +1,23 @@
+package main;
+
+import main.Main.Candidate;
+import main.Main.Voter;
+
+public abstract class Method {
+	
+	public static Plurality PLURALITY = new Plurality();
+	
+	public abstract double assign(Main.Voter v);
+	
+	public static class Plurality extends Method{
+		
+		private Plurality() {}
+
+		@Override
+		public double assign(Voter v) {
+			
+		}
+		
+	}
+
+}

@@ -1,0 +1,306 @@
+package main;
+
+import main.Election.Voter;
+
+public abstract class Method {
+	
+	public Election election;
+	public String name;
+	
+	public double[] results = new double[Main.CAND_NUM];
+	public void runElection() {
+		for(int i = 0; i < Main.VOTER_NUM; i++) {
+			double[] b = vote(election.voters[i]);
+			for(int j = 0; j < b.length; j++)
+				results[j]+=b[j];
+		}
+	}
+	public abstract double[] vote(Voter v);
+	
+	public abstract int declareWinner();
+	public String printResults() {
+		String out = "";
+		out+="\\e\\ " + election.SEED + " ";
+		out+="\\n\\ " + Main.CAND_NUM + " ";
+		out+="\\" + name + "\\ ";
+		for(int i = 0; i < results.length; i++)
+			out+=results[i] + " ";
+		out+="\\w\\ " + declareWinner() + " ";
+		out+="\\d\\ " + disappointment();
+		return out;
+	}
+	
+	public double disappointment() {
+		double d0 = election.candidates[declareWinner()].getViews(0)-election.average()[0];
+		double d1 = election.candidates[declareWinner()].getViews(1)-election.average()[1];
+		return d0*d0+d1*d1;
+	}
+	
+	public static class Plurality extends Method{
+		
+		public Plurality(Election election) {
+			name = "p";
+			this.election = election;
+		}
+		
+		@Override
+		public double[] vote(Voter v) {
+			int favorite = 0;
+			double favoritism = -10;
+			for(int i = 0; i<results.length; i++) {
+				double t = v.utility(election.candidates[i]);
+				if(t>favoritism) {
+					favorite = i;
+					favoritism = t;
+				}
+			}
+			
+			double[] ballot = new double[results.length];
+			for(int i = 0; i < ballot.length; i++)
+				ballot[i] = i==favorite ? 1 : 0;
+			
+			return ballot;
+		}
+
+		@Override
+		public int declareWinner() {
+			int top = 0;
+			double most = results[0];
+			for(int i = 1; i < results.length; i++)
+				if(results[i]>most) {
+					top = i;
+					most = results[i];
+				}
+			return top;
+		}
+		
+	}
+	public static class Range extends Method{
+		
+		public Range(Election election) {
+			name = "r";
+			this.election = election;
+		}
+
+		@Override
+		public double[] vote(Voter v) {
+			double[] ballot = new double[results.length];
+			for(int i = 0; i < ballot.length; i++)
+				ballot[i] = v.utility(election.candidates[i]);
+			return ballot;
+		}
+
+		@Override
+		public int declareWinner() {
+			int top = 0;
+			double most = results[0];
+			for(int i = 1; i < results.length; i++)
+				if(results[i]>most) {
+					top = i;
+					most = results[i];
+				}
+			return top;
+		}
+		
+	}
+	public static class Borda extends Method{
+		
+		public Borda(Election election) {
+			name = "b";
+			this.election = election;
+		}
+
+		@Override
+		public double[] vote(Voter v) {
+			double[] ballot1 = new double[results.length];
+			for(int i = 0; i < ballot1.length; i++)
+				ballot1[i] = v.utility(election.candidates[i]);
+			
+			double[] ballot = new double[results.length];
+			for(int i = 0; i < ballot.length; i++)
+				for(int j = i+1; j < ballot.length; j++)
+					ballot[ballot1[i]>ballot1[j] ? i : j]++;
+			
+			return ballot;
+		}
+
+		@Override
+		public int declareWinner() {
+			int top = 0;
+			double most = results[0];
+			for(int i = 1; i < results.length; i++)
+				if(results[i]>most) {
+					top = i;
+					most = results[i];
+				}
+			return top;
+		}
+		
+	}
+	public static class Copeland extends Method{
+		
+		public Copeland(Election election) {
+			name = "c";
+			this.election = election;
+		}
+		
+		@Override
+		public void runElection() {
+			double[][] b = new double[Main.CAND_NUM][Main.CAND_NUM];
+			for(int n = 0; n < Main.VOTER_NUM; n++) {
+				double[] v = vote(election.voters[n]);
+				for(int i = 0; i < b.length; i++)
+				for(int j = i+1; j < b.length; j++) {
+					if(v[i]>v[j]) b[i][j]++;
+					else b[i][j]--;
+				}
+			}
+			for(int i = 0; i < b.length; i++)
+			for(int j = i+1; j < b.length; j++) {
+				if(b[i][j]>0) results[i]++;
+				else results[j]++;
+			}
+		}
+		
+		@Override
+		public double[] vote(Voter v) {
+			double[] ballot1 = new double[results.length];
+			for(int i = 0; i < ballot1.length; i++)
+				ballot1[i] = v.utility(election.candidates[i]);
+			
+			double[] ballot = new double[results.length];
+			for(int i = 0; i < ballot.length; i++)
+				for(int j = i+1; j < ballot.length; j++)
+					ballot[ballot1[i]>ballot1[j] ? i : j]++;
+			
+			return ballot;
+		}
+
+		
+		@Override
+		public int declareWinner() {
+			int top = 0;
+			double most = results[0];
+			for(int i = 1; i < results.length; i++)
+				if(results[i]>most) {
+					top = i;
+					most = results[i];
+				}
+			return top;
+		}
+		
+	}
+	public static class Hale extends Method{
+		
+		boolean[] running = new boolean[Main.CAND_NUM];
+		
+		public Hale(Election election) {
+			name = "h";
+			this.election = election;
+			for(int i = 0; i < running.length; i++) running[i] = true;
+		}
+		
+		@Override
+		public void runElection() {
+			double[] round = new double[Main.CAND_NUM];
+			for(int i = 0; i < running.length; i++) {
+				for(Voter v : election.voters) {
+					double[] b = vote(v);
+					for(int j = 0; j < b.length; j++)
+						round[j]+=b[j];
+				}
+				int min = 0;
+				double minnum = Main.VOTER_NUM;
+				for(int j = 1; j < round.length; j++) {
+					if(round[j]<minnum && running[j]) {
+						min = j;
+						minnum = round[j];
+					}
+					if(running[j])
+						results[j]++;
+				}
+				running[min]=false;
+			}
+		}
+		
+		@Override
+		public double[] vote(Voter v) {
+			int favorite = 0;
+			double favoritism = -10;
+			for(int i = 0; i<results.length; i++) {
+				double t = v.utility(election.candidates[i]);
+				if(!running[i]) continue;
+				if(t>favoritism) {
+					favorite = i;
+					favoritism = t;
+				}
+			}
+			
+			double[] ballot = new double[results.length];
+			for(int i = 0; i < ballot.length; i++)
+				ballot[i] = i==favorite ? 1 : 0;
+			
+			return ballot;
+		}
+
+		@Override
+		public int declareWinner() {
+			int top = 0;
+			double most = results[0];
+			for(int i = 1; i < results.length; i++)
+				if(results[i]>most) {
+					top = i;
+					most = results[i];
+				}
+			return top;
+		}
+		
+	}
+	public static class Lottery extends Method{
+		
+		public Lottery(Election election) {
+			name = "l";
+			this.election = election;
+		}
+		
+		@Override
+		public void runElection() {
+			double[] b = vote(election.voters[election.r.nextInt(Main.VOTER_NUM)]);
+			for(int j = 0; j < b.length; j++)
+				results[j]+=b[j];
+		}
+		
+		@Override
+		public double[] vote(Voter v) {
+			int favorite = 0;
+			double favoritism = -10;
+			for(int i = 0; i<results.length; i++) {
+				double t = v.utility(election.candidates[i]);
+				if(t>favoritism) {
+					favorite = i;
+					favoritism = t;
+				}
+			}
+			
+			double[] ballot = new double[results.length];
+			for(int i = 0; i < ballot.length; i++)
+				ballot[i] = i==favorite ? 1 : 0;
+			
+			return ballot;
+		}
+
+		
+		@Override
+		public int declareWinner() {
+			int top = 0;
+			double most = results[0];
+			for(int i = 1; i < results.length; i++)
+				if(results[i]>most) {
+					top = i;
+					most = results[i];
+				}
+			return top;
+		}
+		
+	}
+}

@@ -1,0 +1,49 @@
+package main;
+
+import main.Main.Candidate;
+import main.Main.Voter;
+
+public abstract class Method {
+	
+	public static Plurality PLURALITY = new Plurality();
+	
+	public double[] results = new double[Main.Candidate.NUM];
+	public void runElection() {
+		for(Voter v : Main.voters) {
+			double[] b = vote(v);
+			for(int i = 0; i < b.length; i++)
+				results[i]+=b[i];
+		}
+	}
+	public abstract double[] vote(Main.Voter v);
+	public void printResults() {
+		for(int i = 0; i < results.length; i++)
+			System.out.println(i + " - " + results[i]);
+	}
+	
+	private static class Plurality extends Method{
+		
+		private Plurality() {}
+
+		@Override
+		public double[] vote(Voter v) {
+			int favorite = 0;
+			double favoritism = 0;
+			for(int i = 0; i<Main.Candidate.NUM; i++) {
+				double t = v.utility(Main.candidates[i]);
+				if(t>favoritism) {
+					favorite = i;
+					favoritism = t;
+				}
+			}
+			
+			double[] ballot = new double[Main.Candidate.NUM];
+			for(int i = 0; i < ballot.length; i++)
+				ballot[i] = i==favorite ? 1 : 0;
+			
+			return ballot;
+		}
+		
+	}
+
+}
